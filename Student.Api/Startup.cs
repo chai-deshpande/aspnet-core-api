@@ -32,17 +32,21 @@ namespace Student.Api
       services.AddMvc(option => option.EnableEndpointRouting = false);
 
       // Make IOptions<ExceptionalSettings> available for injection everywhere
-      services.AddExceptional(Configuration.GetSection("Exceptional"), settings =>
+      services.AddExceptional(Configuration.GetSection("Exceptional"), settings => 
       {
         //settings.DefaultStore.ApplicationName = "Samples.AspNetCore";
-        settings.UseExceptionalPageOnThrow = Environment.IsDevelopment();
+        //settings.UseExceptionalPageOnThrow = Environment.IsDevelopment();
+        //settings.Store.ApplicationName = "Students API"; 
+        //settings.Store.Path = "./errors";
+        //settings.Store.Type = "JSON";
+        //settings.Store.Size = 100;
       });
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
     public void Configure(IApplicationBuilder app)
     {
-      new Exception("Startup test exception - see how I'm captured! This happens due to a pre-.Configure() IStartupFilter").LogNoContext();
+      //new Exception("Startup test exception - see how I'm captured! This happens due to a pre-.Configure() IStartupFilter").LogNoContext();
       // Boilerplate we're no longer using with Exceptional
       //if (env.IsDevelopment())
       //{
@@ -54,11 +58,6 @@ namespace Student.Api
       //    app.UseExceptionHandler("/Home/Error");
       //}
       app.UseExceptional();
-
-      //if (Environment.IsDevelopment())
-      //{
-      //  app.UseDeveloperExceptionPage();
-      //}
 
       app.UseHttpsRedirection();
 
