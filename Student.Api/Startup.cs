@@ -31,15 +31,12 @@ namespace Student.Api
       services.AddControllers();
       services.AddMvc(option => option.EnableEndpointRouting = false);
 
+      var exceptionsSection = Configuration.GetSection("Exceptional");
+
       // Make IOptions<ExceptionalSettings> available for injection everywhere
-      services.AddExceptional(Configuration.GetSection("Exceptional"), settings => 
+      services.AddExceptional(exceptionsSection, settings =>
       {
-        //settings.DefaultStore.ApplicationName = "Samples.AspNetCore";
-        //settings.UseExceptionalPageOnThrow = Environment.IsDevelopment();
-        //settings.Store.ApplicationName = "Students API"; 
-        //settings.Store.Path = "./errors";
-        //settings.Store.Type = "JSON";
-        //settings.Store.Size = 100;
+        settings.UseExceptionalPageOnThrow = Environment.IsDevelopment();
       });
     }
 
