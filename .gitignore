@@ -36,3 +36,4 @@ msbuild.wrn
 # Visual Studio 2019
 .vs/
 Student.Api/errors/
+Student.Api/logs/
