@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Azure.Cosmos;
+using Azure.Cosmos.Fluent;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -12,6 +14,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using StackExchange.Exceptional;
+using Student.Api.Repositories;
 
 namespace Student.Api
 {
@@ -39,6 +42,21 @@ namespace Student.Api
       {
         settings.UseExceptionalPageOnThrow = Environment.IsDevelopment();
       });
+
+      // Add the CosmosClient with Singleton scope
+      services.AddSingleton((s) => CreateCosmosClientInstance(Configuration));
+      services.AddSingleton<IStudentDocumentRepository, StudentDocumentRepository>();
+    }
+
+    private static CosmosClient CreateCosmosClientInstance(IConfiguration configuration)
+    {
+      string connectionString = configuration["connectionStrings:documentdb"];
+      if (string.IsNullOrEmpty(connectionString))
+      {
+        throw new ArgumentNullException("Please specify a valid connection sting for the document db in appSettings.json");
+      }
+
+      return new CosmosClientBuilder(connectionString).Build();
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Serilog.Context;
+using Student.Api.Repositories;
+using Student.Api.Requests;
+using Student = Student.Api.Models.Student;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -16,11 +19,13 @@ namespace Student.Api.Controllers
   public class StudentsController : ControllerBase
   {
     private readonly ILogger<StudentsController> _logger;
+    private readonly IStudentDocumentRepository _studentDocumentRepository;
     public IConfiguration Configuration { get; }
 
-    public StudentsController(IConfiguration configuration, ILogger<StudentsController> logger)
+    public StudentsController(IConfiguration configuration, ILogger<StudentsController> logger, IStudentDocumentRepository studentDocumentRepository)
     {
       _logger = logger;
+      _studentDocumentRepository = studentDocumentRepository;
       Configuration = configuration;
     }
 
@@ -42,14 +47,16 @@ namespace Student.Api.Controllers
 
     // POST api/<StudentsController>
     [HttpPost]
-    public void Post([FromBody] string value)
+    public void Post([FromBody] StudentRequest student)
     {
+      _studentDocumentRepository.AddAsync(new Models.Student {FirstName = student.FirstName, LastName = student.LastName, Age = student.Age, DateOfBirth = student.DateOfBirth}, student.LastName);
     }
 
     // PUT api/<StudentsController>/5
     [HttpPut("{id}")]
-    public void Put(int id, [FromBody] string value)
+    public void Put(Guid id, [FromBody] StudentRequest student)
     {
+      _studentDocumentRepository.UpdateAsync(new Models.Student {Id = id.ToString(), FirstName = student.FirstName, LastName = student.LastName, Age = student.Age, DateOfBirth = student.DateOfBirth}, student.LastName);
     }
 
     // DELETE api/<StudentsController>/5
