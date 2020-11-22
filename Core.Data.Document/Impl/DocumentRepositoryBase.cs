@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Azure.Cosmos;
@@ -24,7 +23,7 @@ namespace Core.Data.Document.Impl
 
     public async Task AddAsync(TEntity entity, string partitionKey)
     {
-      var itemResponse = await _cosmosContainer.CreateItemAsync<TEntity>(entity, new PartitionKey(partitionKey));
+      var itemResponse = await _cosmosContainer.CreateItemAsync(entity, new PartitionKey(partitionKey));
 
       entity.Id = itemResponse.Value.Id;
     }
@@ -60,7 +59,7 @@ namespace Core.Data.Document.Impl
 
     public async Task UpdateAsync(TEntity entity, string partitionKey)
     {
-      await _cosmosContainer.ReplaceItemAsync<TEntity>(entity, entity.Id, new PartitionKey(partitionKey));
+      await _cosmosContainer.ReplaceItemAsync(entity, entity.Id, new PartitionKey(partitionKey));
     }
 
     public void Dispose()

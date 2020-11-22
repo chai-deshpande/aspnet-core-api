@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Azure.Cosmos;
 using Azure.Cosmos.Fluent;
 using Microsoft.AspNetCore.Builder;
@@ -44,8 +45,19 @@ namespace Student.Api
       });
 
       // Add the CosmosClient with Singleton scope
-      services.AddSingleton((s) => CreateCosmosClientInstance(Configuration));
+      services.AddSingleton(s => CreateCosmosClientInstance(Configuration));
       services.AddSingleton<IStudentDocumentRepository, StudentDocumentRepository>();
+
+      // Auto Mapper Configurations
+      services.AddSingleton(s => CreateAutoMapper());
+    }
+
+    private static IMapper CreateAutoMapper()
+    {
+      var mapperConfig = new MapperConfiguration(mc => { mc.AddProfile(new AutoMappingProfile()); });
+
+      var mapper = mapperConfig.CreateMapper();
+      return mapper;
     }
 
     private static CosmosClient CreateCosmosClientInstance(IConfiguration configuration)
