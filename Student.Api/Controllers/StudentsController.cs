@@ -13,6 +13,8 @@ using Student.Api.Responses;
 
 namespace Student.Api.Controllers
 {
+  [Consumes("application/json")]
+  [Produces("application/json", "application/xml")]
   [Route("api/[controller]")]
   [ApiController]
   public class StudentsController : ControllerBase
@@ -30,8 +32,11 @@ namespace Student.Api.Controllers
       Configuration = configuration;
     }
 
-    // GET: api/<StudentsController>
-    [HttpGet]
+    /// <summary>
+    /// Gets all the Students in the school
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet(Name = "GetStudents")]
     public async Task<IEnumerable<StudentResponse>> Get()
     {
       _logger.LogInformation("api/students list called");
@@ -46,30 +51,36 @@ namespace Student.Api.Controllers
       return _mapper.Map<IEnumerable<StudentResponse>>(studentsList);
     }
 
-    // GET api/<StudentsController>/5
-    [HttpGet("{id}")]
-    public string Get(int id)
+    [HttpGet("{id}", Name = "GetStudent")]
+    public async Task<ActionResult<StudentResponse>> Get(Guid id, [FromQuery]string lastName)
     {
-      return "value";
+      var student = await _studentDocumentRepository.GetByIdAsync(id.ToString(), lastName);
+
+      if (student == null)
+      {
+        return NotFound();
+      }
+
+      return Ok(_mapper.Map<StudentResponse>(student));
     }
 
-    // POST api/<StudentsController>
-    [HttpPost]
-    public void Post([FromBody] StudentRequest student)
+    [HttpPost(Name = "CreateStudent")]
+    public async Task<ActionResult<StudentResponse>> Post([FromBody] StudentRequest student)
     {
       var studentModel = _mapper.Map<Models.Student>(student);
 
-      _studentDocumentRepository.AddAsync(studentModel, student.LastName);
+      await _studentDocumentRepository.AddAsync(studentModel, student.LastName);
+
+      return CreatedAtRoute("GetStudent", new {studentModel.Id, studentModel.LastName}, _mapper.Map<StudentResponse>(studentModel));
     }
 
-    // PUT api/<StudentsController>/5
-    [HttpPut("{id}")]
-    public void Put(Guid id, [FromBody] StudentRequest student)
+    [HttpPut("{id}", Name = "UpdateStudent")]
+    public async Task Put(Guid id, [FromBody] StudentRequest student)
     {
       var studentModel = _mapper.Map<Models.Student>(student);
       studentModel.Id = id.ToString();
 
-      _studentDocumentRepository.UpdateAsync(studentModel, student.LastName);
+      await _studentDocumentRepository.UpdateAsync(studentModel, student.LastName);
     }
 
     // DELETE api/<StudentsController>/5

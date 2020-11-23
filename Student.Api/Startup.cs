@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using AutoMapper;
 using Azure.Cosmos;
@@ -13,6 +15,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi.Models;
+using Newtonsoft.Json.Serialization;
 using Serilog;
 using StackExchange.Exceptional;
 using Student.Api.Repositories;
@@ -33,7 +37,12 @@ namespace Student.Api
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)
     {
-      services.AddControllers();
+      services.AddControllers()
+        .AddNewtonsoftJson(setupAction =>
+        {
+          setupAction.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+        });
+
       services.AddMvc(option => option.EnableEndpointRouting = false);
 
       var exceptionsSection = Configuration.GetSection("Exceptional");
@@ -42,6 +51,21 @@ namespace Student.Api
       services.AddExceptional(exceptionsSection, settings =>
       {
         settings.UseExceptionalPageOnThrow = Environment.IsDevelopment();
+      });
+
+      // Add Swagger
+      services.AddSwaggerGen(setupAction =>
+      {
+        setupAction.SwaggerDoc("StudentsAPI", new OpenApiInfo()
+        {
+          Title = "Students API",
+          Description = "Description for Students API"
+        });
+
+        // Locate the xml documentation file using relative path
+        var xmlCommentsFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+        var xmlCommentsFullPath = Path.Combine(AppContext.BaseDirectory, xmlCommentsFile);
+        setupAction.IncludeXmlComments(xmlCommentsFullPath);
       });
 
       // Add the CosmosClient with Singleton scope
@@ -54,7 +78,10 @@ namespace Student.Api
 
     private static IMapper CreateAutoMapper()
     {
-      var mapperConfig = new MapperConfiguration(mc => { mc.AddProfile(new AutoMappingProfile()); });
+      var mapperConfig = new MapperConfiguration(configure =>
+      {
+        configure.AddProfile(new AutoMappingProfile());
+      });
 
       var mapper = mapperConfig.CreateMapper();
       return mapper;
@@ -63,6 +90,7 @@ namespace Student.Api
     private static CosmosClient CreateCosmosClientInstance(IConfiguration configuration)
     {
       string connectionString = configuration["connectionStrings:documentdb"];
+
       if (string.IsNullOrEmpty(connectionString))
       {
         throw new ArgumentNullException("Please specify a valid connection sting for the document db in appSettings.json");
@@ -93,6 +121,14 @@ namespace Student.Api
       app.UseHttpsRedirection();
 
       app.UseRouting();
+
+      app.UseSwagger();
+
+      app.UseSwaggerUI(setupAction =>
+      {
+        setupAction.SwaggerEndpoint($"/swagger/StudentsAPI/swagger.json", "StudentsAPI");
+        setupAction.RoutePrefix = "api";
+      });
 
       app.UseAuthorization();
 

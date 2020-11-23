@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Student.Api</name>
+    </assembly>
+    <members>
+        <member name="M:Student.Api.Controllers.ErrorsController.Exceptions">
+            <summary>
+            This lets you access the error handler via a route in your application, secured by whatever
+            mechanisms are already in place.
+            </summary>
+            <remarks>If mapping via RouteAttribute: [Route("errors/{path?}/{subPath?}")]</remarks>
+        </member>
+        <member name="M:Student.Api.Controllers.StudentsController.Get">
+            <summary>
+            Gets all the Students in the school
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:Student.Api.Requests.StudentRequest">
+            <summary>
+            Student request
+            </summary>
+        </member>
+        <member name="P:Student.Api.Requests.StudentRequest.FirstName">
+            <summary>
+            First name of the Student
+            </summary>
+        </member>
+        <member name="P:Student.Api.Requests.StudentRequest.LastName">
+            <summary>
+            Last name of the student
+            </summary>
+        </member>
+        <member name="P:Student.Api.Requests.StudentRequest.Age">
+            <summary>
+            Age of the student
+            </summary>
+        </member>
+        <member name="P:Student.Api.Requests.StudentRequest.DateOfBirth">
+            <summary>
+            Date of birth
+            </summary>
+        </member>
+    </members>
+</doc>
