@@ -128,6 +128,7 @@ namespace Student.Api
       {
         setupAction.SwaggerEndpoint($"/swagger/StudentsAPI/swagger.json", "StudentsAPI");
         setupAction.RoutePrefix = "api";
+        setupAction.DisplayRequestDuration();
       });
 
       app.UseAuthorization();

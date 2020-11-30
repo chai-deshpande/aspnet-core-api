@@ -18,5 +18,8 @@ namespace Student.Api.Models
 
     [JsonPropertyName("dateOfBirth")]
     public DateTime DateOfBirth { get; set; }
+
+    [JsonPropertyName("city")]
+    public string City { get; set; }
   }
 }

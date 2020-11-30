@@ -26,5 +26,10 @@ namespace Student.Api.Requests
     /// Date of birth
     /// </summary>
     public DateTime DateOfBirth { get; set; }
+
+    /// <summary>
+    /// City the Student belongs to
+    /// </summary>
+    public string City { get; set; }
   }
 }

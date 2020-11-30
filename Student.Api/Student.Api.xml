@@ -42,5 +42,10 @@
             Date of birth
             </summary>
         </member>
+        <member name="P:Student.Api.Requests.StudentRequest.City">
+            <summary>
+            City the Student belongs to
+            </summary>
+        </member>
     </members>
 </doc>

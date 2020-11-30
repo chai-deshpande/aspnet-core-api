@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.30611.23
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Student.Api", "Student.Api.csproj", "{12C351DE-700D-4E3B-ABA7-21AFA472F931}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Data.Document", "..\Core.Data.Document\Core.Data.Document.csproj", "{E420301A-133C-4104-8704-5D76118ED046}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core.Data.Document", "..\Core.Data.Document\Core.Data.Document.csproj", "{E420301A-133C-4104-8704-5D76118ED046}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
