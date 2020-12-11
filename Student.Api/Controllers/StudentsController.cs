@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.ServiceBus;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Student.Api.Repositories;
 using Student.Api.Requests;
 using Student.Api.Responses;
@@ -71,16 +74,45 @@ namespace Student.Api.Controllers
 
       await _studentDocumentRepository.AddAsync(studentModel, student.LastName);
 
+      await PostAuditMessage("create", studentModel);
+
       return CreatedAtRoute("GetStudent", new {studentModel.Id, studentModel.LastName}, _mapper.Map<StudentResponse>(studentModel));
     }
 
+    private async Task PostAuditMessage(string action, Models.Student studentModel)
+    {
+      var queueClient = new QueueClient(Configuration["connectionStrings:service-bus"], "student-audit");
+
+      try
+      {
+        var messageBody = JsonConvert.SerializeObject(studentModel);
+        var message = new Message(Encoding.UTF8.GetBytes(messageBody))
+        {
+          MessageId = action == "create" ? $"{studentModel.Id}" : $"{studentModel.Id}-{DateTime.UtcNow.Ticks}",
+          Label = action
+        };
+
+        // Send the message
+        await queueClient.SendAsync(message);
+      }
+      finally
+      {
+        // Close the client
+        await queueClient.CloseAsync();
+      }
+    }
+
     [HttpPut("{id}", Name = "UpdateStudent")]
-    public async Task Put(Guid id, [FromBody] StudentRequest student)
+    public async Task<ActionResult<StudentResponse>> Put(Guid id, [FromBody] StudentRequest student)
     {
       var studentModel = _mapper.Map<Models.Student>(student);
       studentModel.Id = id.ToString();
 
       await _studentDocumentRepository.UpdateAsync(studentModel, student.LastName);
+
+      await PostAuditMessage("update", studentModel);
+
+      return Ok(_mapper.Map<StudentResponse>(studentModel));
     }
 
     // DELETE api/<StudentsController>/5
